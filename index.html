@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Souriau 8STA — Interactive Motorsport Connector Catalogue | IndexArch</title>
+  <meta name="description" content="Interactive product catalogue for the Souriau 8STA motorsport connector series. Filter, compare, and request quotes for circular connectors used in Formula 1, WEC, and professional motorsport wiring.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#9881;</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="header-left">
+        <h1 class="header-title">Souriau <span style="font-family:var(--font-mono);letter-spacing:0.02em">8STA</span></h1>
+        <span class="header-subtitle">Motorsport Connector Catalogue</span>
+        <span class="demo-badge">DEMO</span>
+      </div>
+      <div class="header-right">
+        <span class="product-count" id="product-count">20 products</span>
+        <button class="btn-header btn-theme-toggle" id="btn-theme" aria-label="Toggle theme">
+          <svg class="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg class="icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <button class="btn-header" id="btn-filters-toggle">
+          Filters <span class="badge" id="filter-badge" style="display:none">0</span>
+        </button>
+        <button class="btn-header btn-quote-header" id="btn-quote">
+          Quote <span class="badge" id="quote-badge" style="display:none">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Tab Bar -->
+  <nav class="tab-bar">
+    <div class="tab-bar-inner">
+      <button class="main-tab-btn active" data-tab="catalog">Catalog</button>
+      <button class="main-tab-btn" data-tab="spec-engine">Spec Engine</button>
+    </div>
+  </nav>
+
+  <!-- Spec Engine Section -->
+  <section class="spec-engine-section" id="spec-engine-section" style="display:none">
+    <div class="spec-engine-inner">
+
+      <!-- Sub-tabs: Requirements vs Cross-Reference -->
+      <div class="spec-tab-bar">
+        <button class="spec-tab-btn active" data-spectab="requirements">Specify by Requirements</button>
+        <button class="spec-tab-btn" data-spectab="crossref">Cross-Reference</button>
+      </div>
+
+      <!-- Requirements Panel -->
+      <div class="spec-panel" id="spec-requirements-panel">
+        <div class="spec-layout">
+          <div class="spec-input-panel">
+            <h3 class="spec-panel-title">Wire Group Requirements</h3>
+            <p class="spec-panel-desc">Define your wire groups by count and current draw. The engine will find connectors with contact sizes rated for your requirements.</p>
+
+            <div class="wire-groups-form">
+              <div class="wire-groups-header">
+                <span class="wg-header-label">Wire Count</span>
+                <span class="wg-header-label">Current (A)</span>
+                <span class="wg-header-spacer"></span>
+              </div>
+              <div id="wire-groups-body"></div>
+            </div>
+
+            <button class="btn-add-wire-group" id="btn-add-wire-group">+ Add Wire Group</button>
+
+            <div class="wire-group-summary" id="wire-group-summary">Total wires: 0 | Groups: 0</div>
+
+            <button class="btn-find-matching" id="btn-find-matching">Find Matching Connectors</button>
+          </div>
+
+          <div class="spec-results-panel" id="spec-results">
+            <!-- Results rendered by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Cross-Reference Panel -->
+      <div class="spec-panel" id="spec-crossref-panel" style="display:none">
+        <div class="spec-layout">
+          <div class="spec-input-panel">
+            <h3 class="spec-panel-title">Cross-Reference Lookup</h3>
+            <p class="spec-panel-desc">Find the 8STA equivalent for a competitor connector. Enter the competitor shell size and layout number.</p>
+
+            <div class="crossref-form">
+              <div class="crossref-field">
+                <label>Manufacturer</label>
+                <select class="crossref-select" id="crossref-manufacturer">
+                  <option value="deutsch-as">Deutsch AS (MIL-DTL-38999)</option>
+                </select>
+              </div>
+              <div class="crossref-field">
+                <label>Shell Size</label>
+                <input type="text" class="crossref-input" id="crossref-shell" placeholder="e.g. 12">
+              </div>
+              <div class="crossref-field">
+                <label>Layout Number</label>
+                <input type="text" class="crossref-input" id="crossref-layout" placeholder="e.g. 35">
+              </div>
+            </div>
+
+            <button class="btn-find-matching" id="btn-find-equivalent">Find 8STA Equivalent</button>
+          </div>
+
+          <div class="spec-results-panel" id="crossref-results">
+            <!-- Results rendered by JS -->
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Part Number Decoder -->
+  <section class="decoder-section catalog-view" id="decoder-section">
+    <div class="decoder-inner">
+      <div class="decoder-header">
+        <h2 class="decoder-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          Part Number Decoder
+        </h2>
+        <span class="decoder-toggle">&#9660;</span>
+      </div>
+      <div class="decoder-body" id="decoder-body">
+        <div class="decoder-controls"></div>
+        <div class="decoder-result" id="decoder-result"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Filters -->
+  <section class="filters-section catalog-view" id="filters-section">
+    <div class="filters-inner">
+      <div class="search-bar">
+        <input type="text" class="search-input" id="search-input" placeholder="Search by part number, spec, or keyword...">
+      </div>
+      <div class="filters-row">
+        <div id="filter-groups"></div>
+      </div>
+      <div class="filters-actions">
+        <button class="btn-clear-filters" id="btn-clear-filters" style="display:none">Clear All Filters</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Product Grid -->
+  <main class="main-content catalog-view">
+    <div class="product-grid" id="product-grid"></div>
+  </main>
+
+  <!-- Compare Tray -->
+  <div class="compare-tray" id="compare-tray"></div>
+
+  <!-- Modals -->
+  <div class="modal-overlay" id="product-modal"></div>
+  <div class="modal-overlay" id="compare-modal"></div>
+  <div class="modal-overlay" id="quote-modal"></div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <p>Built by <strong>IndexArch</strong> — Interactive Catalogs for B2B Manufacturers</p>
+      <p style="margin-top:4px;font-size:0.72rem;color:var(--text-muted);">Demo — 20 products from the Souriau 8STA range of 100+ variants</p>
+      <a href="https://indexarch.com" target="_blank" rel="noopener">indexarch.com</a>
+    </div>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/connector-database.js"></script>
+  <script src="js/svg-generators.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/spec-engine.js"></script>
+</body>
+</html>
