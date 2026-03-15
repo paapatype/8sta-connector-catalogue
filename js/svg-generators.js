@@ -187,27 +187,42 @@ const ConnectorSVG = (function() {
     const outerR = 150;
     const innerR = 124;
 
-    // Scale contact positions from the 200×200 base to this larger canvas
-    const scale = outerR / 80;
-    const positions = getContactPositions(contactCount, cx, cy);
-    const scaledPositions = positions.map(p => ({
-      x: cx + (p.x - 100) * scale,
-      y: cy + (p.y - 100) * scale,
-      pin: p.pin
-    }));
-
-    // Contact radius — make them large enough to hold a number inside
-    let minSpacing = Infinity;
+    // Get contact positions directly in this coordinate system
+    // by computing them fresh (not scaling from the 200×200 base)
     const layout = getLayout(contactCount);
+    const scaledPositions = [];
+    let pinNum = 1;
+    // The layout ring radii are for outerR=80. Scale to our outerR.
+    const rScale = innerR / 66; // 66 is innerR in 200×200 base
+
+    for (const ring of layout) {
+      for (let i = 0; i < ring.n; i++) {
+        let x, y;
+        if (ring.r === 0) {
+          x = cx;
+          y = cy;
+        } else {
+          const scaledR = ring.r * rScale;
+          const startAngle = -Math.PI / 2;
+          const angle = startAngle + (2 * Math.PI * i) / ring.n;
+          x = cx + scaledR * Math.cos(angle);
+          y = cy + scaledR * Math.sin(angle);
+        }
+        scaledPositions.push({ x, y, pin: pinNum++ });
+      }
+    }
+
+    // Contact radius — large enough to hold a number inside
+    let minSpacing = Infinity;
     for (const ring of layout) {
       if (ring.r > 0 && ring.n > 1) {
-        const spacing = (2 * Math.PI * ring.r * scale) / ring.n;
+        const scaledR = ring.r * rScale;
+        const spacing = (2 * Math.PI * scaledR) / ring.n;
         minSpacing = Math.min(minSpacing, spacing);
       }
     }
-    // Contacts sized to nearly touch their neighbors — numbers sit inside
-    const pinR = Math.max(5, Math.min(12, (minSpacing || 20) * 0.44));
-    const fontSize = Math.max(5, Math.min(9.5, pinR * 0.88));
+    const pinR = Math.max(6, Math.min(14, (minSpacing || 24) * 0.44));
+    const fontSize = Math.max(5.5, Math.min(10, pinR * 0.85));
 
     const isSmallShell = shellSize === '01' || shellSize === '02';
     const viewLabel = isSmallShell
@@ -230,10 +245,10 @@ const ConnectorSVG = (function() {
       const px = pos.x.toFixed(1);
       const py = pos.y.toFixed(1);
 
-      // Contact circle — filled background so number is readable
+      // Contact disc — dark fill with gold border
       svg += `<circle cx="${px}" cy="${py}" r="${pinR.toFixed(1)}" fill="${c.bodyInner}" stroke="${c.gold}" stroke-width="1.5"/>`;
 
-      // Pin number centered inside the contact
+      // Pin number centered inside
       svg += `<text x="${px}" y="${(pos.y + fontSize * 0.35).toFixed(1)}" text-anchor="middle" font-family="'Inter','Helvetica',sans-serif" font-size="${fontSize.toFixed(1)}" font-weight="600" fill="${c.gold}" style="pointer-events:none">${pos.pin}</text>`;
     }
 
