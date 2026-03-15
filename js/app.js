@@ -304,7 +304,7 @@
         <div class="modal-body">
           <div class="detail-grid">
             <div class="detail-svg-wrap">
-              ${ConnectorSVG.generate(product)}
+              ${ConnectorSVG.generateDetailed ? ConnectorSVG.generateDetailed(product) : ConnectorSVG.generate(product)}
             </div>
             <div class="detail-info">
               <div class="detail-part-number">${product.partNumber}</div>

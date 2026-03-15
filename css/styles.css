@@ -946,16 +946,20 @@ input, select {
   background: var(--bg-primary);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  padding: 24px;
+  padding: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
-  aspect-ratio: 1;
 }
 
-.detail-svg-wrap .connector-svg {
+.detail-svg-wrap .connector-svg,
+.detail-svg-wrap .connector-svg-detailed {
   width: 100%;
   height: 100%;
+}
+
+.connector-svg-detailed text {
+  user-select: none;
 }
 
 .detail-info {
