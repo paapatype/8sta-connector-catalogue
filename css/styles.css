@@ -938,15 +938,24 @@ input, select {
 /* === PRODUCT DETAIL MODAL === */
 .detail-grid {
   display: grid;
-  grid-template-columns: 220px 1fr;
-  gap: 32px;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+.detail-left {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: sticky;
+  top: 80px;
 }
 
 .detail-svg-wrap {
   background: var(--bg-primary);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  padding: 20px;
+  padding: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -955,7 +964,8 @@ input, select {
 .detail-svg-wrap .connector-svg,
 .detail-svg-wrap .connector-svg-detailed {
   width: 100%;
-  height: 100%;
+  height: auto;
+  max-width: 360px;
 }
 
 .connector-svg-detailed text {
@@ -970,7 +980,7 @@ input, select {
 
 .detail-part-number {
   font-family: var(--font-mono);
-  font-size: 1.4rem;
+  font-size: 1.5rem;
   font-weight: 600;
   letter-spacing: 0.02em;
 }
@@ -985,8 +995,7 @@ input, select {
 .detail-specs {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-top: 4px;
+  gap: 8px;
 }
 
 .detail-spec {
@@ -1017,7 +1026,6 @@ input, select {
 .detail-actions {
   display: flex;
   gap: 10px;
-  margin-top: 8px;
 }
 
 .btn-action {
@@ -2364,21 +2372,23 @@ input, select {
   .modal-body { padding: 14px 16px; }
 
   /* Detail modal */
-  .detail-grid { grid-template-columns: 1fr; gap: 14px; }
+  .detail-grid { grid-template-columns: 1fr; gap: 16px; }
+  .detail-left { position: static; }
 
   .detail-svg-wrap {
-    max-width: 120px;
+    max-width: 260px;
     margin: 0 auto;
-    padding: 14px;
+    padding: 16px;
   }
 
-  .detail-part-number { font-size: 1.05rem; }
+  .detail-part-number { font-size: 1.1rem; }
   .detail-description { font-size: 0.8rem; }
   .detail-specs { grid-template-columns: repeat(2, 1fr); gap: 5px; }
   .detail-spec { padding: 7px 8px; }
   .detail-spec-label { font-size: 0.55rem; }
   .detail-spec-value { font-size: 0.75rem; }
-  .detail-actions { flex-direction: column; gap: 6px; }
+  .detail-actions { flex-direction: row; gap: 6px; }
+  .detail-actions .btn-action { flex: 1; justify-content: center; }
   .detail-actions .btn-action { justify-content: center; padding: 11px 16px; }
 
   /* Comparison */

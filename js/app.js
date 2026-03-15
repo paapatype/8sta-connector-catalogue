@@ -296,15 +296,25 @@
     ];
 
     modal.innerHTML = `
-      <div class="modal-content">
+      <div class="modal-content wide">
         <div class="modal-header">
           <span class="modal-title">${product.partNumber}</span>
           <button class="modal-close" data-close>&times;</button>
         </div>
         <div class="modal-body">
           <div class="detail-grid">
-            <div class="detail-svg-wrap">
-              ${ConnectorSVG.generateDetailed ? ConnectorSVG.generateDetailed(product) : ConnectorSVG.generate(product)}
+            <div class="detail-left">
+              <div class="detail-svg-wrap">
+                ${ConnectorSVG.generateDetailed ? ConnectorSVG.generateDetailed(product) : ConnectorSVG.generate(product)}
+              </div>
+              <div class="detail-actions">
+                <button class="btn-action btn-action-primary" data-action="detail-quote" data-id="${product.id}">
+                  ${inQuote ? '&#10003; In Quote' : '+ Add to Quote'}
+                </button>
+                <button class="btn-action btn-action-secondary ${isCompared ? 'active' : ''}" data-action="detail-compare" data-id="${product.id}">
+                  &#x229E; ${isCompared ? 'Comparing' : 'Compare'}
+                </button>
+              </div>
             </div>
             <div class="detail-info">
               <div class="detail-part-number">${product.partNumber}</div>
@@ -316,14 +326,6 @@
                     <span class="detail-spec-value">${value}</span>
                   </div>
                 `).join('')}
-              </div>
-              <div class="detail-actions">
-                <button class="btn-action btn-action-primary" data-action="detail-quote" data-id="${product.id}">
-                  ${inQuote ? '&#10003; In Quote' : '+ Add to Quote'}
-                </button>
-                <button class="btn-action btn-action-secondary ${isCompared ? 'active' : ''}" data-action="detail-compare" data-id="${product.id}">
-                  &#x229E; ${isCompared ? 'Comparing' : 'Compare'}
-                </button>
               </div>
             </div>
           </div>
