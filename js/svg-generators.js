@@ -175,28 +175,28 @@ const ConnectorSVG = (function() {
 
   /**
    * Generate detailed SVG with MIL-DTL-38999 pin numbering.
-   * Used in detail modal and spec engine results.
+   * Numbers rendered directly inside each contact position.
    */
   function generateDetailed(product) {
     const { contactCount, orientation, shellSize } = product;
     const isSocket = orientation ? orientation.includes('Socket') : true;
     const c = getColors();
 
-    const size = 320;
+    const size = 360;
     const cx = size / 2, cy = size / 2;
-    const outerR = 130, innerR = 108;
+    const outerR = 150;
+    const innerR = 124;
 
-    const positions = getContactPositions(contactCount, cx, cy);
-    // Scale positions to larger canvas
+    // Scale contact positions from the 200×200 base to this larger canvas
     const scale = outerR / 80;
+    const positions = getContactPositions(contactCount, cx, cy);
     const scaledPositions = positions.map(p => ({
       x: cx + (p.x - 100) * scale,
       y: cy + (p.y - 100) * scale,
-      pin: p.pin,
-      ringR: p.ringR * scale
+      pin: p.pin
     }));
 
-    // Pin radius
+    // Contact radius — make them large enough to hold a number inside
     let minSpacing = Infinity;
     const layout = getLayout(contactCount);
     for (const ring of layout) {
@@ -205,62 +205,46 @@ const ConnectorSVG = (function() {
         minSpacing = Math.min(minSpacing, spacing);
       }
     }
-    const pinR = Math.max(3, Math.min(9, (minSpacing || 16) * 0.38));
-    const showNumbers = contactCount <= 61;
-    const fontSize = Math.max(4.5, Math.min(7, pinR * 0.85));
+    // Contacts sized to nearly touch their neighbors — numbers sit inside
+    const pinR = Math.max(5, Math.min(12, (minSpacing || 20) * 0.44));
+    const fontSize = Math.max(5, Math.min(9.5, pinR * 0.88));
 
-    // Determine view label
     const isSmallShell = shellSize === '01' || shellSize === '02';
     const viewLabel = isSmallShell
       ? 'Rear view of receptacle'
       : 'Front view of male insulator';
 
-    let svg = `<svg viewBox="0 0 ${size} ${size + 28}" xmlns="http://www.w3.org/2000/svg" class="connector-svg-detailed">`;
+    let svg = `<svg viewBox="0 0 ${size} ${size + 26}" xmlns="http://www.w3.org/2000/svg" class="connector-svg-detailed">`;
 
-    // Body
+    // Outer body
     svg += `<circle cx="${cx}" cy="${cy}" r="${outerR}" fill="${c.bodyOuter}" stroke="${c.bodyStroke}" stroke-width="2"/>`;
+    // Inner face
     svg += `<circle cx="${cx}" cy="${cy}" r="${innerR}" fill="${c.bodyInner}" stroke="${c.innerStroke}" stroke-width="1.5"/>`;
 
-    // Keyway notch
-    svg += `<rect x="${cx - 8}" y="${cy - outerR - 2}" width="16" height="24" rx="3" fill="${c.keyway}" stroke="${c.bodyStroke}" stroke-width="1.5"/>`;
-    svg += `<line x1="${cx}" y1="${cy - outerR + 22}" x2="${cx}" y2="${cy - innerR - 3}" stroke="${c.innerStroke}" stroke-width="2"/>`;
+    // Keyway notch at 12 o'clock
+    svg += `<rect x="${cx - 9}" y="${cy - outerR - 2}" width="18" height="28" rx="3" fill="${c.keyway}" stroke="${c.bodyStroke}" stroke-width="1.5"/>`;
+    svg += `<line x1="${cx}" y1="${cy - outerR + 26}" x2="${cx}" y2="${cy - innerR - 3}" stroke="${c.innerStroke}" stroke-width="2"/>`;
 
-    // Contacts with pin numbers
+    // Draw each contact with its pin number inside
     for (const pos of scaledPositions) {
       const px = pos.x.toFixed(1);
       const py = pos.y.toFixed(1);
 
-      if (isSocket) {
-        svg += `<circle cx="${px}" cy="${py}" r="${pinR.toFixed(1)}" fill="none" stroke="${c.gold}" stroke-width="1.5"/>`;
-        svg += `<circle cx="${px}" cy="${py}" r="${(pinR * 0.25).toFixed(1)}" fill="${c.goldStroke}" opacity="0.4"/>`;
-      } else {
-        svg += `<circle cx="${px}" cy="${py}" r="${pinR.toFixed(1)}" fill="${c.gold}" stroke="${c.goldStroke}" stroke-width="0.8"/>`;
-      }
+      // Contact circle — filled background so number is readable
+      svg += `<circle cx="${px}" cy="${py}" r="${pinR.toFixed(1)}" fill="${c.bodyInner}" stroke="${c.gold}" stroke-width="1.5"/>`;
 
-      // Pin number label
-      if (showNumbers) {
-        const textColor = isSocket ? c.gold : '#1a1a1e';
-        const textY = (pos.y * scale / (80 / (outerR)) + cy * (1 - scale / (80 / outerR))).toFixed(1);
-        svg += `<text x="${px}" y="${(parseFloat(py) + fontSize * 0.35).toFixed(1)}"
-          text-anchor="middle" font-family="'Inter','Helvetica',sans-serif"
-          font-size="${fontSize.toFixed(1)}" font-weight="600"
-          fill="${textColor}"
-          ${isSocket ? '' : 'opacity="0.9"'}
-          style="pointer-events:none">${pos.pin}</text>`;
-      }
+      // Pin number centered inside the contact
+      svg += `<text x="${px}" y="${(pos.y + fontSize * 0.35).toFixed(1)}" text-anchor="middle" font-family="'Inter','Helvetica',sans-serif" font-size="${fontSize.toFixed(1)}" font-weight="600" fill="${c.gold}" style="pointer-events:none">${pos.pin}</text>`;
     }
 
-    // Dashed outer ring
-    svg += `<circle cx="${cx}" cy="${cy}" r="${outerR}" fill="none" stroke="${c.bodyStroke}" stroke-width="0.8" stroke-dasharray="3,6"/>`;
+    // Subtle dashed outer ring
+    svg += `<circle cx="${cx}" cy="${cy}" r="${outerR}" fill="none" stroke="${c.bodyStroke}" stroke-width="0.7" stroke-dasharray="3,6"/>`;
 
-    // "Pin 1" indicator arrow
-    const pin1 = scaledPositions[0];
-    if (pin1) {
-      svg += `<line x1="${pin1.x.toFixed(1)}" y1="${(cy - innerR + 2).toFixed(1)}" x2="${pin1.x.toFixed(1)}" y2="${(pin1.y - pinR - 3).toFixed(1)}" stroke="${c.gold}" stroke-width="1" stroke-dasharray="2,2" opacity="0.5"/>`;
-    }
+    // "PIN 1" label above keyway
+    svg += `<text x="${cx}" y="${cy - outerR - 8}" text-anchor="middle" font-family="'Inter','Helvetica',sans-serif" font-size="8.5" font-weight="600" fill="${c.gold}" letter-spacing="0.5">PIN 1</text>`;
 
-    // View label at bottom
-    svg += `<text x="${cx}" y="${size + 16}" text-anchor="middle" font-family="'Inter','Helvetica',sans-serif" font-size="8" fill="${c.bodyStroke}" letter-spacing="0.5">${viewLabel} · Keyway at 12 o'clock · Clockwise numbering</text>`;
+    // View orientation label at bottom
+    svg += `<text x="${cx}" y="${size + 16}" text-anchor="middle" font-family="'Inter','Helvetica',sans-serif" font-size="7.5" fill="${c.bodyStroke}" letter-spacing="0.3">${viewLabel} · Clockwise from keyway</text>`;
 
     svg += '</svg>';
     return svg;
